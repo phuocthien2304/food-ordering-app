@@ -1,4 +1,4 @@
-"use client
+"use client"
 
 import { useState } from "react"
 import axios from "axios"
@@ -117,7 +117,7 @@ export default function HomePage({ onLoginSuccess, user, API_URL }) {
 
       <div className="auth-container">
         <div className="auth-form">
-          <h3>{isLogin ? "Log in" : "Sign up"}</h3>
+          <h3>{isLogin ? "Đăng nhập" : "Đăng ký"}</h3>
 
           <form onSubmit={handleSubmit}>
             {!isLogin && (
