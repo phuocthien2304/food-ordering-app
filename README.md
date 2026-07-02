@@ -137,7 +137,7 @@ food-ordering-app/
 
 1. **Clone repository**
    \`\`\`bash
-   git clone <repository-url>
+   git clone https://github.com/phuocthien2304/food-ordering-app
    cd food-ordering-app
    \`\`\`
 
