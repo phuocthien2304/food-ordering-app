@@ -37,6 +37,15 @@ jobs:
       - name: Run linter
         working-directory: ./frontend
         run: npm run lint --if-present || echo "No linter configured"
+
+      # BƯỚC BỔ SUNG: Gửi log Frontend về Loki
+      - name: Gửi log Test Frontend về Loki
+        if: always()
+        run: |
+          TS=$(date +%s)000000000
+          curl -H "Content-Type: application/json" -X POST \
+          -d '{"streams": [{"stream": {"job": "github-actions", "stage": "test-frontend", "status": "'"${{ job.status }}"'"}, "values": [["'"$TS"'", "Quy trình Test Frontend kết thúc với trạng thái: '"${{ job.status }}"'"]]}]}' \
+          http://20.24.208.146:3100/loki/api/v1/push
   
   test-backend:
     runs-on: ubuntu-latest
@@ -69,3 +78,12 @@ jobs:
         run: |
           npm ci
           npm test --if-present || echo "No tests"
+
+      # BƯỚC BỔ SUNG: Gửi log Backend về Loki
+      - name: Gửi log Test Backend về Loki
+        if: always()
+        run: |
+          TS=$(date +%s)000000000
+          curl -H "Content-Type: application/json" -X POST \
+          -d '{"streams": [{"stream": {"job": "github-actions", "stage": "test-backend", "status": "'"${{ job.status }}"'"}, "values": [["'"$TS"'", "Quy trình Test Backend kết thúc với trạng thái: '"${{ job.status }}"'"]]}]}' \
+          http://20.24.208.146:3100/loki/api/v1/push
