@@ -1,4 +1,4 @@
-name: Deploy to AWS EC2 (Docker Compose)
+name: Deploy to Cloud (Docker Compose)
 
 on:
   push:
@@ -8,7 +8,7 @@ on:
       - "frontend/**"
       - "docker-compose.aws.yml"
       - "docker-compose.yml"
-      - ".github/workflows/deploy-ec2.yml"
+      - ".github/workflows/deploy-cloud.yml"
   workflow_dispatch:
     inputs:
       ref:
@@ -17,7 +17,7 @@ on:
         default: "main"
 
 concurrency:
-  group: deploy-ec2
+  group: deploy-cloud
   cancel-in-progress: true
 
 jobs:
@@ -30,14 +30,14 @@ jobs:
 
         # ✅ env: đặt biến ở runner
         env:
-          APP_DIR: ${{ secrets.EC2_APP_DIR }}
+          APP_DIR: ${{ secrets.CLOUD_APP_DIR }}
           DEPLOY_REF: ${{ github.event.inputs.ref || github.ref_name }}
 
         with:
-          host: ${{ secrets.EC2_HOST }}
-          username: ${{ secrets.EC2_USER }}
-          key: ${{ secrets.EC2_SSH_KEY }}
-          port: ${{ secrets.EC2_PORT || '22' }}
+          host: ${{ secrets.CLOUD_HOST }}
+          username: ${{ secrets.CLOUD_USER }}
+          key: ${{ secrets.CLOUD_SSH_KEY }}
+          port: ${{ secrets.CLOUD_PORT || '22' }}
           script_stop: true
           command_timeout: 30m
 
@@ -55,7 +55,7 @@ jobs:
             echo "APP_DIR length: ${#APP_DIR}"
 
             if [ -z "${APP_DIR}" ]; then
-              echo "EC2_APP_DIR secret is required (e.g. /home/ubuntu/food-odering-app)"
+              echo "CLOUD_APP_DIR secret is required (e.g. /home/azureuser/food-odering-app)"
               exit 1
             fi
 
@@ -90,11 +90,11 @@ jobs:
             echo "==> Done"
             docker ps
 
-      # BƯỚC BỔ SUNG: Gửi log Deploy về Loki
+      # Gửi log Deploy về Loki
       - name: Gửi log Deploy về Loki
         if: always()
         run: |
           TS=$(date +%s)000000000
           curl -H "Content-Type: application/json" -X POST \
-          -d '{"streams": [{"stream": {"job": "github-actions", "stage": "deploy", "status": "'"${{ job.status }}"'"}, "values": [["'"$TS"'", "Quy trình Deploy EC2 kết thúc với trạng thái: '"${{ job.status }}"'"]]}]}' \
+          -d '{"streams": [{"stream": {"job": "github-actions", "stage": "deploy", "status": "'"${{ job.status }}"'"}, "values": [["'"$TS"'", "Quy trình Deploy Cloud kết thúc với trạng thái: '"${{ job.status }}"'"]]}]}' \
           http://20.24.208.146:3100/loki/api/v1/push
