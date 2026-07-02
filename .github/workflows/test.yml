@@ -32,11 +32,11 @@ jobs:
       
       - name: Run tests
         working-directory: ./frontend
-        run: npm test --if-present || echo "No tests configured"
+        run: npm run test --if-present
       
       - name: Run linter
         working-directory: ./frontend
-        run: npm run lint --if-present || echo "No linter configured"
+        run: npm run lint --if-present
 
       # BƯỚC BỔ SUNG: Gửi log Frontend về Loki
       - name: Gửi log Test Frontend về Loki
@@ -65,19 +65,19 @@ jobs:
         working-directory: ./backend/api-gateway
         run: |
           npm ci
-          npm test --if-present || echo "No tests"
+          npm run test --if-present
       
       - name: Test User Service
         working-directory: ./backend/user-service
         run: |
           npm ci
-          npm test --if-present || echo "No tests"
+          npm run test --if-present
       
       - name: Test Order Service
         working-directory: ./backend/order-service
         run: |
           npm ci
-          npm test --if-present || echo "No tests"
+          npm run test --if-present
 
       # BƯỚC BỔ SUNG: Gửi log Backend về Loki
       - name: Gửi log Test Backend về Loki
