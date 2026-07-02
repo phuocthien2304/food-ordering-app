@@ -89,3 +89,12 @@ jobs:
 
             echo "==> Done"
             docker ps
+
+      # BƯỚC BỔ SUNG: Gửi log Deploy về Loki
+      - name: Gửi log Deploy về Loki
+        if: always()
+        run: |
+          TS=$(date +%s)000000000
+          curl -H "Content-Type: application/json" -X POST \
+          -d '{"streams": [{"stream": {"job": "github-actions", "stage": "deploy", "status": "'"${{ job.status }}"'"}, "values": [["'"$TS"'", "Quy trình Deploy EC2 kết thúc với trạng thái: '"${{ job.status }}"'"]]}]}' \
+          http://20.24.208.146:3100/loki/api/v1/push
