@@ -18,10 +18,9 @@ class RestaurantController {
   }
 
   @Get()
-  async getRestaurants(@Query('admin') admin) {
-    // If query param admin=true is provided, return all restaurants (for admin panel)
+  async getRestaurants(@Query('admin') admin, @Query('page') page, @Query('limit') limit) {
     const showAll = admin === 'true' || admin === true;
-    return this.restaurantService.findAllRestaurants(showAll);
+    return this.restaurantService.findAllRestaurants(showAll, parseInt(page) || 1, parseInt(limit) || 12);
   }
 
   @Get('search/keyword')
@@ -41,8 +40,8 @@ class RestaurantController {
   }
 
   @Get('menu')
-  async getAllMenuItems(@Query('q') keyword) {
-    return this.restaurantService.getAllMenuItems(keyword);
+  async getAllMenuItems(@Query('q') keyword, @Query('page') page, @Query('limit') limit) {
+    return this.restaurantService.getAllMenuItems(keyword, parseInt(page) || 1, parseInt(limit) || 12);
   }
 
   @Get(':id')
@@ -110,9 +109,9 @@ class RestaurantController {
     return this.restaurantService.toggleMenuItemAvailability(menuItemId, isAvailable);
   }
   @Get(':restaurantId/menu/manage')
-async getMenuForManage(@Param('restaurantId') restaurantId) {
-  return this.restaurantService.getMenuForManage(restaurantId)
-}
+  async getMenuForManage(@Param('restaurantId') restaurantId, @Query('page') page, @Query('limit') limit) {
+    return this.restaurantService.getMenuForManage(restaurantId, parseInt(page) || 1, parseInt(limit) || 12);
+  }
 
 
   @Get(':id/stats')

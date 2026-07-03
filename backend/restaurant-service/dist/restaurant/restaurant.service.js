@@ -49,18 +49,42 @@ let RestaurantService = (_dec = Injectable(), _dec2 = function (target, key) {
   }
 
   // ✅ FIX: dùng đúng this.MenuModel (đã inject)
-  async getMenuForManage(restaurantId) {
-    return this.MenuModel.find({
+  async getMenuForManage(restaurantId, page = 1, limit = 12) {
+    const skip = (page - 1) * limit;
+    const [data, total] = await Promise.all([this.MenuModel.find({
       restaurantId
-    }).exec();
+    }).sort({
+      updatedAt: -1
+    }).skip(skip).limit(limit).exec(), this.MenuModel.countDocuments({
+      restaurantId
+    })]);
+    return {
+      data,
+      pagination: {
+        total,
+        page,
+        limit,
+        totalPages: Math.ceil(total / limit)
+      }
+    };
   }
-  async findAllRestaurants(showAll = false) {
-    if (showAll) {
-      return this.RestaurantModel.find({}).exec();
-    }
-    return this.RestaurantModel.find({
+  async findAllRestaurants(showAll = false, page = 1, limit = 12) {
+    const query = showAll ? {} : {
       isActive: true
-    }).exec();
+    };
+    const skip = (page - 1) * limit;
+    const [data, total] = await Promise.all([this.RestaurantModel.find(query).sort({
+      createdAt: -1
+    }).skip(skip).limit(limit).exec(), this.RestaurantModel.countDocuments(query)]);
+    return {
+      data,
+      pagination: {
+        total,
+        page,
+        limit,
+        totalPages: Math.ceil(total / limit)
+      }
+    };
   }
   async findRestaurantsByLocation(lat, lng, maxDistance = 5000) {
     return this.RestaurantModel.find({
@@ -92,7 +116,7 @@ let RestaurantService = (_dec = Injectable(), _dec2 = function (target, key) {
       }]
     }).exec();
   }
-  async getAllMenuItems(keyword = '') {
+  async getAllMenuItems(keyword = '', page = 1, limit = 12) {
     // ✅ chỉ lọc isActive, không lọc isAvailable
     const query = {
       isActive: true
@@ -111,15 +135,25 @@ let RestaurantService = (_dec = Injectable(), _dec2 = function (target, key) {
         }
       }];
     }
-    const items = await this.MenuModel.find(query).sort({
+    const skip = (page - 1) * limit;
+    const [items, total] = await Promise.all([this.MenuModel.find(query).sort({
       updatedAt: -1
-    }).limit(200).populate('restaurantId', 'name isActive').exec();
+    }).skip(skip).limit(limit).populate('restaurantId', 'name isActive').exec(), this.MenuModel.countDocuments(query)]);
 
     // ✅ ẩn nếu nhà hàng bị tắt
-    return (items || []).filter(it => {
+    const filteredData = (items || []).filter(it => {
       const r = it && it.restaurantId;
       return r && r.isActive !== false;
     });
+    return {
+      data: filteredData,
+      pagination: {
+        total,
+        page,
+        limit,
+        totalPages: Math.ceil(total / limit)
+      }
+    };
   }
   async findRestaurantById(id) {
     return this.RestaurantModel.findById(id).exec();

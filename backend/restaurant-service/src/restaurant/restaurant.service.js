@@ -41,15 +41,23 @@ class RestaurantService {
   }
 
   // ✅ FIX: dùng đúng this.MenuModel (đã inject)
-  async getMenuForManage(restaurantId) {
-    return this.MenuModel.find({ restaurantId }).exec();
+  async getMenuForManage(restaurantId, page = 1, limit = 12) {
+    const skip = (page - 1) * limit;
+    const [data, total] = await Promise.all([
+      this.MenuModel.find({ restaurantId }).sort({ updatedAt: -1 }).skip(skip).limit(limit).exec(),
+      this.MenuModel.countDocuments({ restaurantId })
+    ]);
+    return { data, pagination: { total, page, limit, totalPages: Math.ceil(total / limit) } };
   }
 
-  async findAllRestaurants(showAll = false) {
-    if (showAll) {
-      return this.RestaurantModel.find({}).exec();
-    }
-    return this.RestaurantModel.find({ isActive: true }).exec();
+  async findAllRestaurants(showAll = false, page = 1, limit = 12) {
+    const query = showAll ? {} : { isActive: true };
+    const skip = (page - 1) * limit;
+    const [data, total] = await Promise.all([
+      this.RestaurantModel.find(query).sort({ createdAt: -1 }).skip(skip).limit(limit).exec(),
+      this.RestaurantModel.countDocuments(query)
+    ]);
+    return { data, pagination: { total, page, limit, totalPages: Math.ceil(total / limit) } };
   }
 
   async findRestaurantsByLocation(lat, lng, maxDistance = 5000) {
@@ -77,31 +85,40 @@ class RestaurantService {
     }).exec();
   }
 
-  async getAllMenuItems(keyword = '') {
-  // ✅ chỉ lọc isActive, không lọc isAvailable
-  const query = { isActive: true }
+  async getAllMenuItems(keyword = '', page = 1, limit = 12) {
+    // ✅ chỉ lọc isActive, không lọc isAvailable
+    const query = { isActive: true }
 
-  const q = String(keyword || '').trim()
-  if (q) {
-    query.$or = [
-      { name: { $regex: q, $options: 'i' } },
-      { description: { $regex: q, $options: 'i' } }
-    ]
+    const q = String(keyword || '').trim()
+    if (q) {
+      query.$or = [
+        { name: { $regex: q, $options: 'i' } },
+        { description: { $regex: q, $options: 'i' } }
+      ]
+    }
+
+    const skip = (page - 1) * limit;
+    const [items, total] = await Promise.all([
+      this.MenuModel.find(query)
+        .sort({ updatedAt: -1 })
+        .skip(skip)
+        .limit(limit)
+        .populate('restaurantId', 'name isActive')
+        .exec(),
+      this.MenuModel.countDocuments(query)
+    ]);
+
+    // ✅ ẩn nếu nhà hàng bị tắt
+    const filteredData = (items || []).filter((it) => {
+      const r = it && it.restaurantId
+      return r && r.isActive !== false
+    })
+
+    return { 
+      data: filteredData, 
+      pagination: { total, page, limit, totalPages: Math.ceil(total / limit) } 
+    };
   }
-
-  const items = await this.MenuModel
-    .find(query)
-    .sort({ updatedAt: -1 })
-    .limit(200)
-    .populate('restaurantId', 'name isActive')
-    .exec()
-
-  // ✅ ẩn nếu nhà hàng bị tắt
-  return (items || []).filter((it) => {
-    const r = it && it.restaurantId
-    return r && r.isActive !== false
-  })
-}
 
 
   async findRestaurantById(id) {

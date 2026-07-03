@@ -1,4 +1,4 @@
-const { Controller, Post, Get, Patch, Body, Param, Headers, HttpException, HttpStatus, Inject } = require('@nestjs/common');
+const { Controller, Post, Get, Patch, Delete, Body, Param, Query, Headers, HttpException, HttpStatus, Inject } = require('@nestjs/common');
 const { UserService } = require('./user.service');
 
 @Controller('api/auth') // <--- Lưu ý: Đường dẫn gốc là /api/auth
@@ -112,6 +112,15 @@ class UserController {
     } catch (error) {
       throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
     }
+  }
+  @Get('admin/users')
+  async getAllUsers(@Query('page') page, @Query('limit') limit) {
+    return this.userService.findAllUsers(parseInt(page) || 1, parseInt(limit) || 12);
+  }
+
+  @Delete('admin/users/:id')
+  async deleteUser(@Param('id') id) {
+    return this.userService.deleteUser(id);
   }
 }
 

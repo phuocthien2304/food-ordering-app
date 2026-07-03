@@ -193,21 +193,43 @@ let OrderService = (_dec = Injectable(), _dec2 = function (target, key) {
     }
     this.scheduledProgress.delete(key);
   }
-  async getOrdersByCustomer(customerId) {
-    return this.OrderModel.find({
+  async getOrdersByCustomer(customerId, page = 1, limit = 10) {
+    const skip = (page - 1) * limit;
+    const [data, total] = await Promise.all([this.OrderModel.find({
       customerId
     }).sort({
       createdAt: -1
-    }).exec();
+    }).skip(skip).limit(limit).exec(), this.OrderModel.countDocuments({
+      customerId
+    })]);
+    return {
+      data,
+      pagination: {
+        total,
+        page,
+        limit,
+        totalPages: Math.ceil(total / limit)
+      }
+    };
   }
-  async getOrdersByRestaurant(restaurantId, status = null) {
+  async getOrdersByRestaurant(restaurantId, status = null, page = 1, limit = 10) {
     const query = {
       restaurantId
     };
     if (status) query.status = status;
-    return this.OrderModel.find(query).sort({
+    const skip = (page - 1) * limit;
+    const [data, total] = await Promise.all([this.OrderModel.find(query).sort({
       createdAt: -1
-    }).exec();
+    }).skip(skip).limit(limit).exec(), this.OrderModel.countDocuments(query)]);
+    return {
+      data,
+      pagination: {
+        total,
+        page,
+        limit,
+        totalPages: Math.ceil(total / limit)
+      }
+    };
   }
   async confirmOrder(orderId) {
     const updated = await this.OrderModel.findByIdAndUpdate(orderId, {

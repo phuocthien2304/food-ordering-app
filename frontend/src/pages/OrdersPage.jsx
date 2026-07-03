@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react"
 import axios from "axios"
+import Pagination from "../components/Pagination"
 import "../styles/OrdersPage.css"
 
 export default function OrdersPage({ API_URL }) {
@@ -9,9 +10,15 @@ export default function OrdersPage({ API_URL }) {
   const [loading, setLoading] = useState(true)
   const [expandedOrder, setExpandedOrder] = useState(null)
   const [filter, setFilter] = useState("all")
+  const [pagination, setPagination] = useState({
+    page: 1,
+    limit: 10,
+    total: 0,
+    totalPages: 1,
+  })
 
   useEffect(() => {
-    fetchOrders();
+    fetchOrders(1);
 
     const handleVisibilityChange = () => {
       if (document.visibilityState === 'visible') {
@@ -20,7 +27,12 @@ export default function OrdersPage({ API_URL }) {
     };
 
     document.addEventListener('visibilitychange', handleVisibilityChange);
-    const interval = setInterval(fetchOrders, 10000);
+    const interval = setInterval(() => {
+      setPagination((prev) => {
+        fetchOrders(prev.page);
+        return prev;
+      });
+    }, 10000);
 
     return () => {
       document.removeEventListener('visibilitychange', handleVisibilityChange);
@@ -28,12 +40,18 @@ export default function OrdersPage({ API_URL }) {
     };
   }, []);
 
-  const fetchOrders = async () => {
+  const fetchOrders = async (page = 1) => {
     try {
-      const response = await axios.get(`${API_URL}/orders/customer`, {
+      const limit = 10
+      const response = await axios.get(`${API_URL}/orders/customer?page=${page}&limit=${limit}`, {
         headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
       })
-      setOrders(response.data)
+      if (response.data && response.data.data) {
+        setOrders(response.data.data)
+        setPagination(response.data.pagination || { page: 1, limit, totalPages: 1 })
+      } else {
+        setOrders(response.data || [])
+      }
     } catch (error) {
       if (error.response?.status !== 404) {
         console.error("Lỗi tải đơn hàng:", error.response?.data?.message || error.message)
@@ -54,7 +72,7 @@ export default function OrdersPage({ API_URL }) {
         headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
       })
       // Refresh list
-      await fetchOrders()
+      await fetchOrders(pagination.page)
       alert('Hủy đơn thành công')
     } catch (err) {
       console.error('Hủy đơn thất bại', err)
@@ -220,6 +238,16 @@ export default function OrdersPage({ API_URL }) {
           ))
         )}
       </div>
+
+      {pagination.totalPages > 1 && (
+        <Pagination
+          currentPage={pagination.page}
+          totalPages={pagination.totalPages}
+          onPageChange={(newPage) => {
+            fetchOrders(newPage)
+          }}
+        />
+      )}
     </div>
   )
 }

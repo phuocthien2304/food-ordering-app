@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react"
 import axios from "axios"
+import Pagination from "../components/Pagination"
 import "../styles/AdminDashboard.css"
 
 export default function AdminDashboard({ API_URL }) {
@@ -94,17 +95,29 @@ export default function AdminDashboard({ API_URL }) {
 function UserManagement({ API_URL }) {
   const [users, setUsers] = useState([])
   const [loading, setLoading] = useState(true)
+  const [pagination, setPagination] = useState({
+    page: 1,
+    limit: 12,
+    total: 0,
+    totalPages: 1,
+  })
 
   useEffect(() => {
-    fetchUsers()
+    fetchUsers(1)
   }, [])
 
-  const fetchUsers = async () => {
+  const fetchUsers = async (page = 1) => {
     try {
-      const response = await axios.get(`${API_URL}/admin/users`, {
+      setLoading(true)
+      const response = await axios.get(`${API_URL}/admin/users?page=${page}&limit=${pagination.limit}`, {
         headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
       })
-      setUsers(response.data)
+      if (response.data && response.data.data) {
+        setUsers(response.data.data)
+        setPagination(response.data.pagination || pagination)
+      } else {
+        setUsers(response.data || [])
+      }
     } catch (error) {
       console.error("Tải người dùng thất bại", error)
     } finally {
@@ -119,7 +132,7 @@ function UserManagement({ API_URL }) {
         headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
       })
       alert("Đã xóa người dùng thành công")
-      fetchUsers()
+      fetchUsers(pagination.page)
     } catch (error) {
       alert("Xóa người dùng thất bại")
     }
@@ -160,6 +173,16 @@ function UserManagement({ API_URL }) {
           </tbody>
         </table>
       </div>
+
+      {pagination.totalPages > 1 && (
+        <Pagination
+          currentPage={pagination.page}
+          totalPages={pagination.totalPages}
+          onPageChange={(newPage) => {
+            fetchUsers(newPage)
+          }}
+        />
+      )}
     </div>
   )
 }
@@ -167,19 +190,29 @@ function UserManagement({ API_URL }) {
 function RestaurantManagement({ API_URL }) {
   const [restaurants, setRestaurants] = useState([])
   const [loading, setLoading] = useState(true)
+  const [pagination, setPagination] = useState({
+    page: 1,
+    limit: 12,
+    total: 0,
+    totalPages: 1,
+  })
 
   useEffect(() => {
-    fetchRestaurants()
+    fetchRestaurants(1)
   }, [])
 
-  const fetchRestaurants = async () => {
+  const fetchRestaurants = async (page = 1) => {
     try {
-      const response = await axios.get(`${API_URL}/admin/restaurants`, {
+      setLoading(true)
+      const response = await axios.get(`${API_URL}/admin/restaurants?page=${page}&limit=${pagination.limit}`, {
         headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
       })
       // ensure we always store an array to avoid render errors if API returns an object
       const data = response.data;
-      if (Array.isArray(data)) {
+      if (data && data.data) {
+        setRestaurants(data.data)
+        setPagination(data.pagination || pagination)
+      } else if (Array.isArray(data)) {
         setRestaurants(data)
       } else if (Array.isArray(data?.restaurants)) {
         setRestaurants(data.restaurants)
@@ -203,7 +236,7 @@ function RestaurantManagement({ API_URL }) {
           headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
         },
       )
-      fetchRestaurants()
+      fetchRestaurants(pagination.page)
     } catch (error) {
       alert("Cập nhật nhà hàng thất bại")
     }
@@ -246,6 +279,16 @@ function RestaurantManagement({ API_URL }) {
           </tbody>
         </table>
       </div>
+
+      {pagination.totalPages > 1 && (
+        <Pagination
+          currentPage={pagination.page}
+          totalPages={pagination.totalPages}
+          onPageChange={(newPage) => {
+            fetchRestaurants(newPage)
+          }}
+        />
+      )}
     </div>
   )
 }

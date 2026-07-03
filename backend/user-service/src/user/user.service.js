@@ -174,6 +174,20 @@ class UserService {
       { new: true }
     ).select('-password').exec();
   }
+
+  async findAllUsers(page = 1, limit = 12) {
+    const skip = (page - 1) * limit;
+    const [data, total] = await Promise.all([
+      this.UserModel.find({}).select('-password').sort({ createdAt: -1 }).skip(skip).limit(limit).exec(),
+      this.UserModel.countDocuments({})
+    ]);
+    const normalizedData = data.map(doc => this.normalizeUser(doc));
+    return { data: normalizedData, pagination: { total, page, limit, totalPages: Math.ceil(total / limit) } };
+  }
+
+  async deleteUser(id) {
+    return this.UserModel.findByIdAndDelete(id).exec();
+  }
 }
 
 module.exports = { UserService };
