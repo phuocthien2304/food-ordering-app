@@ -1,174 +1,242 @@
-/* =============================================
-   ORDERS PAGE — ShopeeFood Style
-   ============================================= */
-
 .orders-container {
-  padding: var(--sp-4) 0;
-  max-width: 860px;
+  padding: 20px;
+  max-width: 1200px;
   margin: 0 auto;
 }
 
 .orders-container h2 {
-  font-size: 1.4rem; font-weight: 800;
-  color: var(--text-primary); letter-spacing: -0.02em;
-  margin-bottom: var(--sp-5);
+  font-size: 2rem;
+  color: #333;
+  margin-bottom: 30px;
 }
 
-/* Filter Tabs */
 .filter-tabs {
-  display: flex; gap: 6px;
-  margin-bottom: var(--sp-5); flex-wrap: wrap;
-  background: var(--bg-white); border-radius: var(--r-full);
-  padding: 5px; box-shadow: var(--shadow-card);
-  border: 1px solid var(--border-light);
+  display: flex;
+  gap: 10px;
+  margin-bottom: 25px;
+  flex-wrap: wrap;
 }
 
 .filter-tab {
-  padding: 8px 16px; background: none; border: none;
-  border-radius: var(--r-full); cursor: pointer;
-  font-weight: 600; font-family: var(--font); font-size: 0.82rem;
-  color: var(--text-muted); transition: var(--t-fast); white-space: nowrap;
+  padding: 10px 16px;
+  background: white;
+  border: 2px solid #ddd;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: all 0.3s;
+  color: #666;
 }
 
-.filter-tab:hover { color: var(--text-primary); background: var(--gray-100); }
+.filter-tab:hover {
+  border-color: #ff7043;
+}
 
-.filter-tab.active { background: var(--brand); color: white; box-shadow: 0 2px 6px rgba(238,77,45,0.25); }
+.filter-tab.active {
+  background: #ff7043;
+  color: white;
+  border-color: #ff7043;
+}
 
-/* Orders List */
-.orders-list { display: flex; flex-direction: column; gap: var(--sp-3); }
+.orders-list {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
 
-/* No Orders */
 .no-orders {
-  text-align: center; padding: var(--sp-12);
-  background: var(--bg-white); border-radius: var(--r-xl);
-  color: var(--text-muted); font-size: 0.95rem;
-  box-shadow: var(--shadow-card); border: 1px solid var(--border-light);
+  text-align: center;
+  padding: 60px 20px;
+  background: white;
+  border-radius: 12px;
+  color: #999;
+  font-size: 1.1rem;
 }
 
-/* Order Card */
 .order-card {
-  background: var(--bg-white); border: 1px solid var(--border-light);
-  border-radius: var(--r-lg); padding: var(--sp-4);
-  box-shadow: var(--shadow-card); transition: var(--t-smooth);
-  animation: fadeInUp 0.3s ease both;
+  background: white;
+  border: 2px solid #e0e0e0;
+  border-radius: 12px;
+  padding: 20px;
+  transition: all 0.3s;
 }
 
-.order-card:hover { box-shadow: var(--shadow-md); border-color: var(--border); }
+.order-card:hover {
+  border-color: #ff7043;
+  box-shadow: 0 2px 10px rgba(255, 112, 67, 0.1);
+}
 
-/* Order Header Row */
 .order-header-row {
-  display: flex; justify-content: space-between; align-items: flex-start;
-  margin-bottom: var(--sp-3); gap: var(--sp-4);
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 15px;
+  gap: 15px;
 }
 
 .order-header-row h3 {
-  font-size: 0.95rem; font-weight: 700;
-  color: var(--text-primary); margin: 0 0 3px 0;
+  font-size: 1.2rem;
+  color: #333;
+  margin: 0 0 5px 0;
 }
 
-.order-date { font-size: 0.78rem; color: var(--text-muted); margin: 0; }
+.order-date {
+  font-size: 0.85rem;
+  color: #999;
+  margin: 0;
+}
 
 .order-header-right {
-  display: flex; flex-direction: column; align-items: flex-end; gap: 6px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 8px;
 }
 
-/* Status Badges — ShopeeFood Color Palette */
 .status-badge {
-  padding: 4px 11px; border-radius: var(--r-full);
-  font-size: 0.74rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em;
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  font-weight: 700;
+  text-transform: uppercase;
 }
 
-.badge-pending, .badge-created {
-  background: #FFF3E0; color: #E65100;
+.badge-pending {
+  background: #fff3cd;
+  color: #856404;
 }
 
 .badge-confirmed {
-  background: #E3F2FD; color: #1565C0;
+  background: #cfe2ff;
+  color: #084298;
 }
 
 .badge-preparing {
-  background: #FFF8E1; color: #F57F17;
+  background: #fff5e6;
+  color: #cc5200;
 }
 
 .badge-ready {
-  background: #F3E5F5; color: #6A1B9A;
+  background: #d1e7dd;
+  color: #0f5132;
 }
 
 .badge-completed {
-  background: #E8F5E9; color: #2E7D32;
+  background: #d1e7dd;
+  color: #0f5132;
 }
 
 .badge-cancelled {
-  background: #FFEBEE; color: #B71C1C;
+  background: #f8d7da;
+  color: #842029;
 }
 
-/* Order Total */
 .order-total {
-  font-size: 1.1rem; font-weight: 800; color: var(--brand); margin: 0;
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: #ff7043;
+  margin: 0;
 }
 
 .order-total.cancelled {
-  color: var(--text-muted); text-decoration: line-through;
+  color: #999;
+  text-decoration: line-through;
 }
 
-.order-cancelled { color: #B71C1C; font-size: 0.8rem; margin: 2px 0 0 0; font-weight: 700; }
+.order-cancelled {
+  color: #842029;
+  font-size: 0.9rem;
+  margin: 4px 0 0 0;
+  font-weight: 700;
+}
 
-/* Expand Button */
 .expand-btn {
-  width: 100%; padding: 9px;
-  background: var(--gray-50); border: 1px solid var(--border-light);
-  border-radius: var(--r-sm); cursor: pointer; font-weight: 600;
-  font-family: var(--font); font-size: 0.83rem; color: var(--brand);
-  transition: var(--t-fast);
+  width: 100%;
+  padding: 10px;
+  background: #f9f9f9;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 600;
+  color: #ff7043;
+  transition: all 0.3s;
 }
 
-.expand-btn:hover { background: var(--brand-pale); border-color: var(--brand-pale2); }
+.expand-btn:hover {
+  background: #fff3f0;
+}
 
-/* Order Details */
 .order-details {
-  margin-top: var(--sp-3); padding-top: var(--sp-3);
-  border-top: 1px solid var(--border-light); animation: slideDown 0.22s ease;
+  margin-top: 15px;
+  padding-top: 15px;
+  border-top: 1px solid #e0e0e0;
 }
 
-.items-section, .address-section { margin-bottom: var(--sp-3); }
+.items-section,
+.address-section {
+  margin-bottom: 15px;
+}
 
-.items-section h4, .address-section h4 {
-  font-size: 0.78rem; font-weight: 700; color: var(--text-secondary);
-  text-transform: uppercase; letter-spacing: 0.05em; margin: 0 0 var(--sp-2) 0;
+.items-section h4,
+.address-section h4 {
+  font-size: 1rem;
+  color: #333;
+  margin: 0 0 10px 0;
 }
 
 .items-list {
-  list-style: none; padding: 0; margin: 0;
-  background: var(--gray-50); border: 1px solid var(--border-light);
-  border-radius: var(--r-md); overflow: hidden;
+  list-style: none;
+  padding: 0;
+  margin: 0;
 }
 
 .items-list li {
-  display: flex; justify-content: space-between; align-items: center;
-  padding: 9px var(--sp-3); border-bottom: 1px solid var(--border-light);
-  font-size: 0.875rem; color: var(--text-secondary);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 0;
+  border-bottom: 1px solid #f0f0f0;
+  font-size: 0.95rem;
+  color: #555;
 }
 
-.items-list li:last-child { border-bottom: none; }
-.item-name { flex: 1; color: var(--text-primary); font-weight: 500; }
-.item-qty { margin: 0 var(--sp-2); color: var(--text-muted); font-size: 0.8rem; }
-.item-price { font-weight: 700; color: var(--brand); }
+.item-name {
+  flex: 1;
+}
 
-.address-section p { margin: 3px 0; color: var(--text-secondary); font-size: 0.875rem; }
+.item-qty {
+  margin: 0 10px;
+  color: #999;
+}
 
-/* Status Info */
+.item-price {
+  font-weight: 600;
+  color: #ff7043;
+}
+
+.address-section p {
+  margin: 5px 0;
+  color: #555;
+  font-size: 0.95rem;
+}
+
 .status-info {
-  background: #E8F5E9; border-left: 3px solid #2E7D32;
-  border-radius: 0 var(--r-sm) var(--r-sm) 0;
-  padding: var(--sp-3); margin-top: var(--sp-3);
+  background: #d1e7dd;
+  border-left: 4px solid #0f5132;
+  padding: 15px;
+  border-radius: 6px;
+  margin-top: 15px;
 }
 
-.ready-alert { color: #2E7D32; font-weight: 700; margin: 0; font-size: 0.875rem; }
+.ready-alert {
+  color: #0f5132;
+  font-weight: 600;
+  margin: 0;
+}
 
-.loading { text-align: center; padding: var(--sp-8); color: var(--text-muted); }
-
-@media (max-width: 640px) {
-  .order-header-row { flex-direction: column; }
-  .order-header-right { align-items: flex-start; }
-  .filter-tabs { border-radius: var(--r-lg); }
+.loading {
+  text-align: center;
+  padding: 50px 20px;
+  color: #999;
+  font-size: 1.1rem;
 }

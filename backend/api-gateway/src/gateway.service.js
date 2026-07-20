@@ -68,8 +68,8 @@ class GatewayService {
     return this.proxyRequest('user', 'PATCH', `/api/auth/profile/${userId}`, updateDto);
   }
 
-  async getRestaurants(page = 1, limit = 12) {
-    return this.proxyRequest('restaurant', 'GET', `/api/restaurants?page=${page}&limit=${limit}`);
+  async getRestaurants() {
+    return this.proxyRequest('restaurant', 'GET', '/api/restaurants');
   }
 
   async getRestaurantById(id) {
@@ -84,9 +84,9 @@ class GatewayService {
     return this.proxyRequest('restaurant', 'GET', `/api/restaurants/${restaurantId}/menu`);
   }
 
-  async getAllMenuItems(keyword = '', page = 1, limit = 12) {
+  async getAllMenuItems(keyword = '') {
     const q = String(keyword || '').trim();
-    const suffix = q ? `?q=${encodeURIComponent(q)}&page=${page}&limit=${limit}` : `?page=${page}&limit=${limit}`;
+    const suffix = q ? `?q=${encodeURIComponent(q)}` : '';
     return this.proxyRequest('restaurant', 'GET', `/api/restaurants/menu${suffix}`);
   }
 
@@ -106,11 +106,11 @@ class GatewayService {
     );
   }
 
-async getMenuForManage(restaurantId, page = 1, limit = 12) {
+async getMenuForManage(restaurantId) {
   return this.proxyRequest(
     'restaurant',
     'GET',
-    `/api/restaurants/${restaurantId}/menu/manage?page=${page}&limit=${limit}`
+    `/api/restaurants/${restaurantId}/menu/manage`
   )
 }
 
@@ -125,9 +125,9 @@ async getMenuForManage(restaurantId, page = 1, limit = 12) {
   }
 
   // Dùng cho tab Admin -> Nhà hàng: lấy tất cả nhà hàng
-  async getRestaurantsAdmin(page = 1, limit = 12) {
+  async getRestaurantsAdmin() {
     // Request restaurant-service asking for admin view (include inactive)
-    return this.proxyRequest('restaurant', 'GET', `/api/restaurants?admin=true&page=${page}&limit=${limit}`);
+    return this.proxyRequest('restaurant', 'GET', '/api/restaurants?admin=true');
   }
 
   // Dùng cho Admin toggle trạng thái active của nhà hàng
@@ -140,14 +140,6 @@ async getMenuForManage(restaurantId, page = 1, limit = 12) {
     );
   }
 
-  async getAdminUsers(page = 1, limit = 12) {
-    return this.proxyRequest('user', 'GET', `/api/auth/admin/users?page=${page}&limit=${limit}`);
-  }
-
-  async deleteAdminUser(userId) {
-    return this.proxyRequest('user', 'DELETE', `/api/auth/admin/users/${userId}`);
-  }
-
   async createOrder(orderDto) {
     return this.proxyRequest('order', 'POST', '/api/orders', orderDto);
   }
@@ -156,8 +148,8 @@ async getMenuForManage(restaurantId, page = 1, limit = 12) {
     return this.proxyRequest('order', 'GET', `/api/orders/${orderId}`);
   }
 
-  async getCustomerOrders(customerId, page = 1, limit = 10) {
-    return this.proxyRequest('order', 'GET', `/api/orders/customer/${customerId}?page=${page}&limit=${limit}`);
+  async getCustomerOrders(customerId) {
+    return this.proxyRequest('order', 'GET', `/api/orders/customer/${customerId}`);
   }
 
   async startPreparingOrder(orderId) {
@@ -288,8 +280,8 @@ async getMenuForManage(restaurantId, page = 1, limit = 12) {
     return this.proxyRequest('delivery', 'PATCH', `/api/deliveries/${deliveryId}/complete`, {});
   }
 
-  async getRestaurantOrdersByToken(token, page = 1, limit = 10) {
-    return this.proxyRequest('order', 'GET', `/api/orders/restaurant?page=${page}&limit=${limit}`, null, { Authorization: `Bearer ${token}` });
+  async getRestaurantOrdersByToken(token) {
+    return this.proxyRequest('order', 'GET', '/api/orders/restaurant', null, { Authorization: `Bearer ${token}` });
   }
 
   async getRestaurantStatsByToken(token) {

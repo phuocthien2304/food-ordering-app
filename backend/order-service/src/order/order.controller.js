@@ -29,8 +29,8 @@ class OrderController {
   }
 
   @Get('customer/:customerId')
-  async getCustomerOrders(@Param('customerId') customerId, @Query('page') page, @Query('limit') limit) {
-    return this.orderService.getOrdersByCustomer(customerId, parseInt(page) || 1, parseInt(limit) || 10);
+  async getCustomerOrders(@Param('customerId') customerId) {
+    return this.orderService.getOrdersByCustomer(customerId);
   }
 
   @Get('restaurant/stats')
@@ -54,7 +54,7 @@ class OrderController {
   }
 
   @Get('restaurant')
-  async getRestaurantOrdersFromToken(@Headers('authorization') auth, @Query('page') page, @Query('limit') limit) {
+  async getRestaurantOrdersFromToken(@Headers('authorization') auth) {
     try {
       const token = auth?.replace('Bearer ', '');
       if (!token) throw new HttpException('No token provided', HttpStatus.UNAUTHORIZED);
@@ -62,7 +62,7 @@ class OrderController {
       const decoded = await this.orderService.verifyToken(token);
       if (!decoded.restaurantId) throw new HttpException('No restaurant associated', HttpStatus.BAD_REQUEST);
       
-      return this.orderService.getOrdersByRestaurant(decoded.restaurantId, null, parseInt(page) || 1, parseInt(limit) || 10);
+      return this.orderService.getOrdersByRestaurant(decoded.restaurantId);
     } catch (error) {
       throw new HttpException(error.message, error.status || HttpStatus.INTERNAL_SERVER_ERROR);
     }

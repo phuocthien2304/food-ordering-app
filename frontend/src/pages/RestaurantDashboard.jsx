@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from "react"
 import axios from "axios"
-import Pagination from "../components/Pagination"
 import "../styles/RestaurantDashboard.css"
 
 export default function RestaurantDashboard({ API_URL, user, updateUser }) {
@@ -15,26 +14,15 @@ export default function RestaurantDashboard({ API_URL, user, updateUser }) {
   const [newRest, setNewRest] = useState({ name: '', description: '', phoneNumber: '', email: '', street: '', ward: '', district: '', city: '', lat: '', lng: '' })
   const [menuItems, setMenuItems] = useState([])
   const [newMenu, setNewMenu] = useState({ name: '', description: '', price: '', category: 'MAIN' })
-  const [pagination, setPagination] = useState({
-    page: 1,
-    limit: 10,
-    total: 0,
-    totalPages: 1,
-  })
 
   useEffect(() => {
     // If user has a restaurant, load orders & stats; otherwise show create flow
     if (user && user.restaurantId) {
-      fetchOrders(1)
+      fetchOrders()
       fetchStats()
       fetchMenu()
       const interval = setInterval(() => {
-        // Will refetch the first page on interval for latest orders, or you can skip interval polling when not on page 1.
-        // For simplicity, we just fetch page 1
-        setPagination(prev => {
-          fetchOrders(prev.page)
-          return prev
-        })
+        fetchOrders()
         fetchStats()
       }, 5000)
       return () => clearInterval(interval)
@@ -43,18 +31,12 @@ export default function RestaurantDashboard({ API_URL, user, updateUser }) {
     }
   }, [user])
 
-  const fetchOrders = async (page = 1) => {
+  const fetchOrders = async () => {
     try {
-      const limit = 10
-      const response = await axios.get(`${API_URL}/orders/restaurant?page=${page}&limit=${limit}`, {
+      const response = await axios.get(`${API_URL}/orders/restaurant`, {
         headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
       })
-      if (response.data && response.data.data) {
-        setOrders(response.data.data)
-        setPagination(response.data.pagination || { page: 1, limit: 10, totalPages: 1 })
-      } else {
-        setOrders(response.data || [])
-      }
+      setOrders(response.data)
     } catch (error) {
       if (error.response?.status !== 404) {
         console.error("Lỗi tải đơn hàng:", error.response?.data?.message || error.message)
@@ -86,7 +68,7 @@ export default function RestaurantDashboard({ API_URL, user, updateUser }) {
           headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
         },
       )
-      fetchOrders(pagination.page)
+      fetchOrders()
       fetchStats()
     } catch (error) {
       alert("Cập nhật đơn hàng thất bại: " + error.response?.data?.message)
@@ -103,7 +85,7 @@ export default function RestaurantDashboard({ API_URL, user, updateUser }) {
         },
       )
       alert("Đã xác nhận đơn hàng!")
-      fetchOrders(pagination.page)
+      fetchOrders()
       fetchStats()
     } catch (error) {
       alert("Xác nhận đơn hàng thất bại: " + (error.response?.data?.message || error.message))
@@ -123,7 +105,7 @@ export default function RestaurantDashboard({ API_URL, user, updateUser }) {
         },
       )
       alert("Đã từ chối đơn hàng!")
-      fetchOrders(pagination.page)
+      fetchOrders()
       fetchStats()
     } catch (error) {
       alert("Từ chối đơn hàng thất bại: " + (error.response?.data?.message || error.message))
@@ -396,16 +378,6 @@ export default function RestaurantDashboard({ API_URL, user, updateUser }) {
           </div>
         )}
       </div>
-
-      {pagination.totalPages > 1 && (
-        <Pagination
-          currentPage={pagination.page}
-          totalPages={pagination.totalPages}
-          onPageChange={(newPage) => {
-            fetchOrders(newPage)
-          }}
-        />
-      )}
     </div>
   )
 }

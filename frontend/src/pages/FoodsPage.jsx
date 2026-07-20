@@ -2,37 +2,24 @@
 
 import { useEffect, useMemo, useState } from "react"
 import axios from "axios"
-import Pagination from "../components/Pagination"
 import "../styles/FoodsPage.css"
 
 export default function FoodsPage({ addToCart, API_URL }) {
   const [items, setItems] = useState([])
   const [loading, setLoading] = useState(true)
   const [searchTerm, setSearchTerm] = useState("")
-  const [pagination, setPagination] = useState({
-    page: 1,
-    limit: 12,
-    total: 0,
-    totalPages: 1,
-  })
 
   useEffect(() => {
-    fetchFoods("", 1)
+    fetchFoods("")
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
-  const fetchFoods = async (q, page = 1) => {
+  const fetchFoods = async (q) => {
     try {
       setLoading(true)
-      const suffix = q ? `?q=${encodeURIComponent(q)}&page=${page}&limit=${pagination.limit}` : `?page=${page}&limit=${pagination.limit}`
+      const suffix = q ? `?q=${encodeURIComponent(q)}` : ""
       const response = await axios.get(`${API_URL}/restaurants/menu${suffix}`)
-      
-      if (response.data && response.data.data) {
-        setItems(response.data.data)
-        setPagination(response.data.pagination || pagination)
-      } else {
-        setItems(response.data || [])
-      }
+      setItems(response.data || [])
     } catch (error) {
       if (error.response?.status !== 404) {
         console.error("Lỗi tải món ăn:", error.response?.data?.message || error.message)
@@ -87,10 +74,7 @@ export default function FoodsPage({ addToCart, API_URL }) {
           <button
             className="btn-search"
             type="button"
-            onClick={() => {
-              setPagination({ ...pagination, page: 1 })
-              fetchFoods(searchTerm, 1)
-            }}
+            onClick={() => fetchFoods(searchTerm)}
             disabled={loading}
           >
             Tìm
@@ -159,17 +143,6 @@ export default function FoodsPage({ addToCart, API_URL }) {
           })
         )}
       </div>
-
-      {pagination.totalPages > 1 && (
-        <Pagination
-          currentPage={pagination.page}
-          totalPages={pagination.totalPages}
-          onPageChange={(newPage) => {
-            setPagination({ ...pagination, page: newPage })
-            fetchFoods(searchTerm, newPage)
-          }}
-        />
-      )}
     </div>
   )
 }

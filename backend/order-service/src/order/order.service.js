@@ -188,24 +188,14 @@ class OrderService {
     this.scheduledProgress.delete(key);
   }
 
-  async getOrdersByCustomer(customerId, page = 1, limit = 10) {
-    const skip = (page - 1) * limit;
-    const [data, total] = await Promise.all([
-      this.OrderModel.find({ customerId }).sort({ createdAt: -1 }).skip(skip).limit(limit).exec(),
-      this.OrderModel.countDocuments({ customerId })
-    ]);
-    return { data, pagination: { total, page, limit, totalPages: Math.ceil(total / limit) } };
+  async getOrdersByCustomer(customerId) {
+    return this.OrderModel.find({ customerId }).sort({ createdAt: -1 }).exec();
   }
 
-  async getOrdersByRestaurant(restaurantId, status = null, page = 1, limit = 10) {
+  async getOrdersByRestaurant(restaurantId, status = null) {
     const query = { restaurantId };
     if (status) query.status = status;
-    const skip = (page - 1) * limit;
-    const [data, total] = await Promise.all([
-      this.OrderModel.find(query).sort({ createdAt: -1 }).skip(skip).limit(limit).exec(),
-      this.OrderModel.countDocuments(query)
-    ]);
-    return { data, pagination: { total, page, limit, totalPages: Math.ceil(total / limit) } };
+    return this.OrderModel.find(query).sort({ createdAt: -1 }).exec();
   }
 
   async confirmOrder(orderId) {

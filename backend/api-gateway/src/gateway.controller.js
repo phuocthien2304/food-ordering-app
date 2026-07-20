@@ -82,18 +82,18 @@ class GatewayController {
 
   // ==================== RESTAURANT ENDPOINTS ====================
   @Get('restaurants')
-  async getRestaurants(@Query('page') page, @Query('limit') limit) {
+  async getRestaurants() {
     try {
-      return await this.gatewayService.getRestaurants(page, limit);
+      return await this.gatewayService.getRestaurants();
     } catch (error) {
       throw new HttpException(error.message, error.status || HttpStatus.INTERNAL_SERVER_ERROR);
     }
   }
 
   @Get('restaurants/menu')
-  async getAllMenuItems(@Query('q') keyword, @Query('page') page, @Query('limit') limit) {
+  async getAllMenuItems(@Query('q') keyword) {
     try {
-      return await this.gatewayService.getAllMenuItems(keyword, page, limit);
+      return await this.gatewayService.getAllMenuItems(keyword);
     } catch (error) {
       throw new HttpException(error.message, error.status || HttpStatus.INTERNAL_SERVER_ERROR);
     }
@@ -171,9 +171,9 @@ async deleteMenuItem(@Param('menuItemId') menuItemId) {
 
     // ==================== ADMIN - RESTAURANTS ====================
   @Get('admin/restaurants')
-  async getRestaurantsAdmin(@Query('page') page, @Query('limit') limit) {
+  async getRestaurantsAdmin() {
     try {
-      return await this.gatewayService.getRestaurantsAdmin(page, limit);
+      return await this.gatewayService.getRestaurantsAdmin();
     } catch (error) {
       throw new HttpException(
         error.message,
@@ -181,28 +181,10 @@ async deleteMenuItem(@Param('menuItemId') menuItemId) {
       );
     }
   }
-
-  @Get('admin/users')
-  async getAdminUsers(@Query('page') page, @Query('limit') limit) {
-    try {
-      return await this.gatewayService.getAdminUsers(page, limit);
-    } catch (error) {
-      throw new HttpException(error.message, error.status || HttpStatus.INTERNAL_SERVER_ERROR);
-    }
-  }
-
-  @Delete('admin/users/:id')
-  async deleteAdminUser(@Param('id') id) {
-    try {
-      return await this.gatewayService.deleteAdminUser(id);
-    } catch (error) {
-      throw new HttpException(error.message, error.status || HttpStatus.INTERNAL_SERVER_ERROR);
-    }
-  }
 @Get('restaurants/:restaurantId/menu/manage')
-async getMenuForManage(@Param('restaurantId') restaurantId, @Query('page') page, @Query('limit') limit) {
+async getMenuForManage(@Param('restaurantId') restaurantId) {
   try {
-    return await this.gatewayService.getMenuForManage(restaurantId, page, limit)
+    return await this.gatewayService.getMenuForManage(restaurantId)
   } catch (error) {
     throw new HttpException(error.message, error.status || HttpStatus.BAD_REQUEST)
   }
@@ -244,7 +226,7 @@ async getMenuForManage(@Param('restaurantId') restaurantId, @Query('page') page,
   // New: get orders for the authenticated customer (uses token)
   // NOTE: placed before the ':id' route to avoid accidental route matching of the literal 'customer' value.
   @Get('orders/customer')
-  async getCustomerOrdersByToken(@Headers('authorization') authHeader, @Query('page') page, @Query('limit') limit) {
+  async getCustomerOrdersByToken(@Headers('authorization') authHeader) {
     const token = authHeader && authHeader.replace('Bearer ', '');
     if (!token) {
       throw new HttpException('No token provided', HttpStatus.UNAUTHORIZED);
@@ -253,20 +235,20 @@ async getMenuForManage(@Param('restaurantId') restaurantId, @Query('page') page,
       const profile = await this.gatewayService.getProfileByToken(token);
       const customerId = profile && (profile._id || profile.id);
       if (!customerId) throw new HttpException('Invalid token/profile', HttpStatus.UNAUTHORIZED);
-      return await this.gatewayService.getCustomerOrders(customerId, page, limit);
+      return await this.gatewayService.getCustomerOrders(customerId);
     } catch (error) {
       throw new HttpException(error.message || 'Failed to fetch customer orders', error.status || HttpStatus.BAD_REQUEST);
     }
   }
 
   @Get('orders/restaurant')
-  async getRestaurantOrdersByToken(@Headers('authorization') authHeader, @Query('page') page, @Query('limit') limit) {
+  async getRestaurantOrdersByToken(@Headers('authorization') authHeader) {
     const token = authHeader && authHeader.replace('Bearer ', '');
     if (!token) {
       throw new HttpException('No token provided', HttpStatus.UNAUTHORIZED);
     }
     try {
-      return await this.gatewayService.getRestaurantOrdersByToken(token, page, limit);
+      return await this.gatewayService.getRestaurantOrdersByToken(token);
     } catch (error) {
       throw new HttpException(error.message || 'Failed to fetch restaurant orders', error.status || HttpStatus.BAD_REQUEST);
     }

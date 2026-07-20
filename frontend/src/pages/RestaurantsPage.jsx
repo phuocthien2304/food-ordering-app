@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from "react"
 import axios from "axios"
-import Pagination from "../components/Pagination"
 import "../styles/RestaurantsPage.css"
 
 export default function RestaurantsPage({ cart, addToCart, API_URL }) {
@@ -10,29 +9,16 @@ export default function RestaurantsPage({ cart, addToCart, API_URL }) {
   const [loading, setLoading] = useState(true)
   const [searchTerm, setSearchTerm] = useState("")
   const [selectedRestaurant, setSelectedRestaurant] = useState(null)
-  const [pagination, setPagination] = useState({
-    page: 1,
-    limit: 12,
-    total: 0,
-    totalPages: 1,
-  })
 
   useEffect(() => {
-    fetchRestaurants(1)
+    fetchRestaurants()
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
-  const fetchRestaurants = async (page = 1) => {
+  const fetchRestaurants = async () => {
     try {
-      setLoading(true)
-      const response = await axios.get(`${API_URL}/restaurants?page=${page}&limit=${pagination.limit}`)
-      
-      if (response.data && response.data.data) {
-        setRestaurants(response.data.data)
-        setPagination(response.data.pagination || pagination)
-      } else {
-        setRestaurants(response.data || [])
-      }
+      const response = await axios.get(`${API_URL}/restaurants`)
+      setRestaurants(response.data)
     } catch (error) {
       if (error.response?.status !== 404) {
         console.error("Lỗi tải nhà hàng:", error.response?.data?.message || error.message)
@@ -114,17 +100,6 @@ export default function RestaurantsPage({ cart, addToCart, API_URL }) {
           ))
         )}
       </div>
-
-      {pagination.totalPages > 1 && (
-        <Pagination
-          currentPage={pagination.page}
-          totalPages={pagination.totalPages}
-          onPageChange={(newPage) => {
-            setPagination({ ...pagination, page: newPage })
-            fetchRestaurants(newPage)
-          }}
-        />
-      )}
 
       {selectedRestaurant && (
         <RestaurantMenu

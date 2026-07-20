@@ -2,18 +2,11 @@
 
 import { useEffect, useMemo, useState } from "react"
 import axios from "axios"
-import Pagination from "../components/Pagination"
 import "../styles/RestaurantMenuManagement.css"
 
 export default function RestaurantMenuManagement({ API_URL, user }) {
   const [menuItems, setMenuItems] = useState([])
   const [loading, setLoading] = useState(true)
-  const [pagination, setPagination] = useState({
-    page: 1,
-    limit: 12,
-    total: 0,
-    totalPages: 1,
-  })
 
   // add form
   const [showForm, setShowForm] = useState(false)
@@ -59,26 +52,21 @@ export default function RestaurantMenuManagement({ API_URL, user }) {
 
   useEffect(() => {
     if (user && user.restaurantId) {
-      fetchMenuItems(1)
+      fetchMenuItems()
     } else {
       setLoading(false)
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user])
 
-  const fetchMenuItems = async (page = 1) => {
+  const fetchMenuItems = async () => {
     if (!user || !user.restaurantId) return
     try {
       const response = await axios.get(
-        `${API_URL}/restaurants/${user.restaurantId}/menu/manage?page=${page}&limit=${pagination.limit}`,
+        `${API_URL}/restaurants/${user.restaurantId}/menu/manage`,
         { headers: { Authorization: `Bearer ${localStorage.getItem("token")}` } }
       )
-      if (response.data && response.data.data) {
-        setMenuItems(response.data.data)
-        setPagination(response.data.pagination || pagination)
-      } else {
-        setMenuItems(response.data || [])
-      }
+      setMenuItems(response.data)
     } catch (error) {
       console.error("Tải thực đơn thất bại", error)
     } finally {
@@ -171,7 +159,7 @@ export default function RestaurantMenuManagement({ API_URL, user }) {
       }
 
       closeForm()
-      fetchMenuItems(pagination.page)
+      fetchMenuItems()
     } catch (error) {
       alert(
         (isEditing ? "Cập nhật thất bại: " : "Thêm món thất bại: ") +
@@ -187,7 +175,7 @@ export default function RestaurantMenuManagement({ API_URL, user }) {
         headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
       })
       alert("Xóa món thành công!")
-      fetchMenuItems(pagination.page)
+      fetchMenuItems()
     } catch (error) {
       alert("Xóa món thất bại")
     }
@@ -379,7 +367,7 @@ export default function RestaurantMenuManagement({ API_URL, user }) {
                         onChange={async (e) => {
                           try {
                             await patchMenuItem(item._id, { isActive: !e.target.checked })
-                            fetchMenuItems(pagination.page)
+                            fetchMenuItems()
                           } catch (err) {
                             alert(err.response?.data?.message || "Không thể cập nhật Tạm ẩn")
                           }
@@ -397,7 +385,7 @@ export default function RestaurantMenuManagement({ API_URL, user }) {
                         onChange={async (e) => {
                           try {
                             await patchMenuItem(item._id, { isAvailable: !e.target.checked })
-                            fetchMenuItems(pagination.page)
+                            fetchMenuItems()
                           } catch (err) {
                             alert(err.response?.data?.message || "Không thể cập nhật Hết món")
                           }
@@ -421,17 +409,6 @@ export default function RestaurantMenuManagement({ API_URL, user }) {
           })
         )}
       </div>
-
-      {pagination.totalPages > 1 && (
-        <Pagination
-          currentPage={pagination.page}
-          totalPages={pagination.totalPages}
-          onPageChange={(newPage) => {
-            setPagination({ ...pagination, page: newPage })
-            fetchMenuItems(newPage)
-          }}
-        />
-      )}
     </div>
   )
 }
