@@ -90,7 +90,7 @@ export default function HomePage({ onLoginSuccess, user, API_URL }) {
     return (
       <div className="home-container welcome">
         <h2>Chào mừng trở lại, {user.name}!</h2>
-        <p>Bạn đã đăng nhập với tư cách {user.userType}</p>
+        <p>Bạn đã đăng nhậpp với tư cách {user.userType}</p>
 
         <button
           className="btn-primary"
