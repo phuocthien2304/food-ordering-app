@@ -146,8 +146,8 @@ export default function HomePage({ onLoginSuccess, user, API_URL }) {
                           {type === "CUSTOMER"
                             ? "Khách hàng"
                             : type === "RESTAURANT_STAFF"
-                              ? "Nhà hàng"
-                              : "Tài xế"}
+                            ? "Nhà hàng"
+                            : "Tài xế"}
                         </span>
                       </label>
                     ))}
@@ -191,7 +191,7 @@ export default function HomePage({ onLoginSuccess, user, API_URL }) {
           </form>
 
           <p className="toggle-auth">
-            {isLogin ? "Chưa có tài khoảnnnn? " : "Đã có tài khoản? "}
+            {isLogin ? "Chưa có tài khoản? " : "Đã có tài khoản? "}
             <button
               type="button"
               className="toggle-link"
