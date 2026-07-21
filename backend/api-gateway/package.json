@@ -1,6 +1,6 @@
 
   "name": "api-gateway"
-  "version": "1.0.0",
+  "version": "1.0.0"
   "description": "API Gateway for food ordering microservices",
   "main": "dist/main.js",
   "scripts": {
