@@ -5,7 +5,7 @@
 =======
 {
   "name": "api-gateway",
-  "version": "1.0.0",;
+  "version": "1.0.0",
 >>>>>>> b8476ba (fix: cap nhat script realtime monitor va filter log)
   "description": "API Gateway for food ordering microservices",
   "main": "dist/main.js",
